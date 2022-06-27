@@ -9,7 +9,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pushButton->setVisible (false);
     ui->pushButton_5->setVisible (false);
     QSettings settings("myconf.conf", QSettings::IniFormat);
-    qmakePath = settings.value("QMAKE").toString();
+#ifdef Q_OS_LINUX
+    qmakePath = settings.value("QMAKEUNIX").toString();
+#endif
+#ifdef Q_OS_WIN32
+    qmakePath = settings.value("QMAKEWIN").toString();
+#endif
     if (qmakePath.isEmpty ())
     {
         QMessageBox::warning (this, "Error", "Wrong QMAKE Path");
