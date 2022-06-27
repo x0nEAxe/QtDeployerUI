@@ -27,8 +27,10 @@ void MainWindow::on_pushButton_3_clicked() //deploy folder
     if (!deployDir.isEmpty ()) ui->pushButton_3->setStyleSheet ("QPushButton {background-color: rgb(48, 255, 2);}");
 }
 
+
 void MainWindow::on_pushButton_2_clicked() //deploy
 {
+#ifdef Q_OS_LINUX
     if(!sourceExe.isEmpty () && !deployDir.isEmpty ())
     {
         command = "cqtdeployer";
@@ -43,6 +45,23 @@ void MainWindow::on_pushButton_2_clicked() //deploy
         bash->start(command, args);
         bash->waitForFinished ();
     }
+#endif
+#ifdef Q_OS_WIN32
+    if(!sourceExe.isEmpty () && !deployDir.isEmpty ())
+    {
+        command = "%cqtdeployer%";
+        args << "-qmake" << qmakePath;
+        args << "-bin" << sourceExe;
+        args << "-targetDir" << deployDir;
+        if (ui->checkBox_3->isChecked () && !sourceDir.isEmpty ()) args << "-qmlDir" << sourceDir;
+        if (ui->checkBox_2->isChecked () && !extLibs.isEmpty ()) args << "-libDir" << extLibs << "-recursiveDepth" << QString::number(10);
+        QProcess *bash = new QProcess;
+        connect(bash, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                this, [&](){QMessageBox::information (this, "", "Deploy has finished"); delete bash;});
+        bash->start(command, args);
+        bash->waitForFinished ();
+    }
+#endif
     else
     {
         QMessageBox::warning (this, "Error", "Wrong paths");
