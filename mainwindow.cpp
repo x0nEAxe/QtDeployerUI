@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#ifdef Q_OS_WIN32
+#include "Windows.h"
+#endif
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -48,13 +52,15 @@ void MainWindow::on_pushButton_2_clicked() //deploy
         connect(bash, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
                 this, [&](){QMessageBox::information (this, "", "Deploy has finished"); delete bash;});
         bash->start(command, args);
-        bash->waitForFinished ();
+        bash->waitForStarted();
+        bash->waitForFinished();
     }
 #endif
 #ifdef Q_OS_WIN32
     if(!sourceExe.isEmpty () && !deployDir.isEmpty ())
     {
         command = "%cqtdeployer%";
+        args << command;
         args << "-qmake" << qmakePath;
         args << "-bin" << sourceExe;
         args << "-targetDir" << deployDir;
@@ -63,8 +69,9 @@ void MainWindow::on_pushButton_2_clicked() //deploy
         QProcess *bash = new QProcess;
         connect(bash, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
                 this, [&](){QMessageBox::information (this, "", "Deploy has finished"); delete bash;});
-        bash->start(command, args);
-        bash->waitForFinished ();
+        bash->start("C:\\WINDOWS\\system32\\cmd.exe /K", args);
+        bash->waitForStarted();
+        bash->waitForFinished();
     }
 #endif
     else
