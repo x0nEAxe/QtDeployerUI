@@ -1,2 +1,2 @@
-Create myconf.conf in ./ \n
-Put QMAKE=/path/to/your/qmake in it
+1. Create myconf.conf in ./ 
+2. Put QMAKE=/path/to/your/qmake in it
